@@ -2,8 +2,34 @@ import React from "react";
 
 import "./ProductsList.css";
 import ProductCard from "./ProductCard";
+import useData from "../../hooks/useData";
+import ProductCardSkeleton from "./ProductCardSkeleton";
+import { useSearchParams } from "react-router-dom";
+import Pagination from "../Common/Pagination";
 
 const ProductsList = () => {
+  const [search, setSearch] = useSearchParams();
+  const category = search.get("category");
+  const page = search.get("page");
+
+  const { data, error, isLoading } = useData(
+    "/products",
+    {
+      params: {
+        category,
+        page,
+      },
+    },
+    [category, page]
+  );
+
+  const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  const handlePageChange = (page) => {
+    const currentParams = Object.fromEntries(search);
+    setSearch({ ...currentParams, page });
+  };
+
   return (
     <section className="products_list_section">
       <header className="align_center products_list_header">
@@ -18,17 +44,22 @@ const ProductsList = () => {
       </header>
 
       <div className="products_list">
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
+        {error && <em className="form_error">{error}</em>}
+        {isLoading
+          ? skeletons.map((skeleton) => <ProductCardSkeleton key={skeleton} />)
+          : data?.products &&
+            data.products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
       </div>
+      {data && (
+        <Pagination
+          totalPost={data.totalProducts}
+          poseterPerPage={8}
+          onClick={handlePageChange}
+          currentPage={page}
+        />
+      )}
     </section>
   );
 };
