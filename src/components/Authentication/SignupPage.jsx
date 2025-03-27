@@ -5,12 +5,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signup } from "../../services/UserServices";
 
-// name - Name should be at least 3 characters.
-// email - Please enter valid email
-// password - Password must be at least 8 characters.
-// confirmPassword - Confirm Password does not match Password
-// deliveryAddress - Address must be at least 15 characters.
 const schema = z
   .object({
     name: z
@@ -32,6 +28,7 @@ const schema = z
 
 const SignupPage = () => {
   const [profilePic, setProfilePic] = useState(null);
+  const [formError, setFormError] = useState("");
 
   const {
     register,
@@ -39,9 +36,17 @@ const SignupPage = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
 
-  const onSubmit = (FormData) => console.log(FormData);
-
-  console.log(profilePic);
+  const onSubmit = async (FormData) => {
+    try {
+      const res = await signup(FormData, profilePic);
+      localStorage.setItem("token", res.data.token);
+      window.location = "/";
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setFormError(error.response.data.message);
+      }
+    }
+  };
 
   return (
     <section className="align_center form_page">
@@ -69,7 +74,6 @@ const SignupPage = () => {
           />
         </div>
 
-        {/* Form Inputs */}
         <div className="form_inputs signup_form_input">
           <div>
             <label htmlFor="name">Name</label>
@@ -141,6 +145,8 @@ const SignupPage = () => {
           </div>
         </div>
 
+        {formError && <em className="form_error">{formError}</em>}
+
         <button className="search_button form_submit" type="submit">
           Submit
         </button>
@@ -150,9 +156,3 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
-
-// name - Name should be at least 3 characters.
-// email - Please enter valid email
-// password - Password must be at least 8 characters.
-// confirmPassword - Confirm Password does not match Password
-// deliveryAddress - Address must be at least 15 characters.

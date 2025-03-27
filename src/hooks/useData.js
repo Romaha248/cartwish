@@ -13,7 +13,19 @@ const useData = (endpoint, customConfig, deps) => {
       const fetchData = async () => {
         try {
           const response = await apiClient.get(endpoint, customConfig);
-          setData(response.data);
+          if (
+            endpoint === "/products" &&
+            data &&
+            data.products &&
+            customConfig.params.page !== 1
+          ) {
+            setData((prev) => ({
+              ...prev,
+              products: [...prev.products, ...response.data.products],
+            }));
+          } else {
+            setData(response.data);
+          }
           setIsLoading(false);
         } catch (error) {
           setError(error.message);
@@ -25,10 +37,6 @@ const useData = (endpoint, customConfig, deps) => {
     },
     deps ? deps : []
   );
-
-  if (data) {
-    console.log(data.totalProducts);
-  }
 
   return { data, error, isLoading };
 };

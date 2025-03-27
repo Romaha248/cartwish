@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import "./LoginPage.css";
+import { login } from "../../services/UserServices";
 
 const schema = z.object({
   email: z
@@ -16,6 +17,8 @@ const schema = z.object({
 });
 
 const LoginPage = () => {
+  const [formError, setFormError] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -40,7 +43,18 @@ const LoginPage = () => {
   //     console.log(user);
   //   };
 
-  const onSubmit = (FormData) => console.log(FormData);
+  const onSubmit = async (FormData) => {
+    try {
+      const res = await login(FormData);
+      // console.log(res.data.token);
+      localStorage.setItem("token", res.data.token);
+      window.location = "/";
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setFormError(error.response.data.message);
+      }
+    }
+  };
 
   return (
     <section className="align_center form_page">
@@ -77,6 +91,9 @@ const LoginPage = () => {
               <em className="form_error">{errors.password.message}</em>
             )}
           </div>
+
+          {formError && <em className="form_error">{formError}</em>}
+
           <button type="submit" className="search_button form_submit">
             Submit
           </button>
