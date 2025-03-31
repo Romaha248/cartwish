@@ -9,6 +9,7 @@ import MyOrderPage from "../components/MyOrder/MyOrderPage";
 import LoginPage from "../components/Authentication/LoginPage";
 import SignupPage from "../components/Authentication/SignupPage";
 import LogOut from "../components/Authentication/LogOut";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AllRouting = () => {
   return (
@@ -18,9 +19,11 @@ const AllRouting = () => {
       <Route path="/products/:_id" element={<SingleProductPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cart" element={<CartPage />} />
-      <Route path="/myorders" element={<MyOrderPage />} />
-      <Route path="logout" element={<LogOut />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/myorders" element={<MyOrderPage />} />
+        <Route path="logout" element={<LogOut />} />
+      </Route>
     </Routes>
   );
 };

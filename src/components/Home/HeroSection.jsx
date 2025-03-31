@@ -1,20 +1,34 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 import "./HeroSection.css";
+import { Link } from "react-router-dom";
 
 const HeroSection = ({ title, subtitle, link, image }) => {
   return (
     <section className="hero_section">
-      <div className="align_center">
+      <motion.div
+        className="align_center"
+        initial={{ opacity: 0, x: -100 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <h2 className="hero_title">{title}</h2>
         <p className="hero_subtitle">{subtitle}</p>
-        <a href={link} className="hero_link">
+        <Link to={link} className="hero_link">
           Buy Now
-        </a>
-      </div>
-      <div className="align_center">
+        </Link>
+      </motion.div>
+      <motion.div
+        className="align_center"
+        initial={{ opacity: 0, x: 100 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, ease: "easeInOut" }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <img src={image} alt="" className="hero_image" />
-      </div>
+      </motion.div>
     </section>
   );
 };

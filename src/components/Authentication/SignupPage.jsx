@@ -5,7 +5,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signup } from "../../services/UserServices";
+import { getUser, signup } from "../../services/UserServices";
+import { Navigate } from "react-router-dom";
 
 const schema = z
   .object({
@@ -38,8 +39,8 @@ const SignupPage = () => {
 
   const onSubmit = async (FormData) => {
     try {
-      const res = await signup(FormData, profilePic);
-      localStorage.setItem("token", res.data.token);
+      await signup(FormData, profilePic);
+
       window.location = "/";
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -47,6 +48,10 @@ const SignupPage = () => {
       }
     }
   };
+
+  if (getUser()) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <section className="align_center form_page">

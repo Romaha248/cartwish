@@ -2,12 +2,22 @@ import React from "react";
 
 import "./QuantityInput.css";
 
-const QuantityInput = ({ stock, quantity, setQuantity }) => {
+const QuantityInput = ({
+  stock,
+  quantity,
+  setQuantity,
+  cartPage,
+  productId,
+}) => {
   return (
     <>
       <button
         className="quantity_input_button"
-        onClick={() => setQuantity(quantity - 1)}
+        onClick={() => {
+          cartPage
+            ? setQuantity("decrease", productId)
+            : setQuantity(quantity - 1);
+        }}
         disabled={quantity === 1}
       >
         {" "}
@@ -16,7 +26,11 @@ const QuantityInput = ({ stock, quantity, setQuantity }) => {
       <p className="quantity_input_count">{quantity}</p>
       <button
         className="quantity_input_button"
-        onClick={() => setQuantity(quantity + 1)}
+        onClick={() => {
+          cartPage
+            ? setQuantity("increase", productId)
+            : setQuantity(quantity + 1);
+        }}
         disabled={quantity === stock}
       >
         {" "}

@@ -9,64 +9,96 @@ import Pagination from "../Common/Pagination";
 
 const ProductsList = () => {
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("");
+  const [sortedProducts, setSortedProducts] = useState([]);
   const [search, setSearch] = useSearchParams();
   const category = search.get("category");
+  const pageFromQuery = parseInt(search.get("page")) || 1;
+  const searchQuery = search.get("search");
 
   const { data, error, isLoading } = useData(
     "/products",
     {
       params: {
+        search: searchQuery,
         category,
         perPage: 8,
         page,
       },
     },
-    [category, page]
+    [searchQuery, category, page]
   );
 
   useEffect(() => {
-    setPage(1);
-  }, [category]);
+    setPage(pageFromQuery);
+  }, [category, pageFromQuery]);
 
   const skeletons = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  // const handlePageChange = (page) => {
-  //   const currentParams = Object.fromEntries(search);
-  //   setSearch({ ...currentParams, page });
-  // };
+  const handlePageChange = (page) => {
+    const currentParams = Object.fromEntries(search);
+    setSearch({ ...currentParams, page });
+  };
 
   // const handlePageChange = (page) => {
   //   const currentParams = Object.fromEntries(search);
   //   setSearch({ ...currentParams, page: parseInt(currentParams.page) + 1 });
   // };
 
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const { scrollTop, clientHeight, scrollHeight } =
+  //       document.documentElement;
+  //     if (
+  //       scrollTop + clientHeight >= scrollHeight - 0.5 &&
+  //       !isLoading &&
+  //       data &&
+  //       page < data.totalPages
+  //     ) {
+  //       console.log("fetch more");
+  //       setPage((prev) => prev + 1);
+  //     }
+  //   };
+
+  //   window.addEventListener("scroll", handleScroll);
+
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [data, isLoading]);
+
   useEffect(() => {
-    const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } =
-        document.documentElement;
-      if (
-        scrollTop + clientHeight >= scrollHeight - 0.5 &&
-        !isLoading &&
-        data &&
-        page < data.totalPages
-      ) {
-        console.log("fetch more");
-        setPage((prev) => prev + 1);
+    if (data && data.products) {
+      const products = [...data.products];
+
+      if (sortBy === "price desc") {
+        setSortedProducts(products.sort((a, b) => b.price - a.price));
+      } else if (sortBy === "price asc") {
+        setSortedProducts(products.sort((a, b) => a.price - b.price));
+      } else if (sortBy === "rate desc") {
+        setSortedProducts(
+          products.sort((a, b) => b.reviews.rate - a.reviews.rate)
+        );
+      } else if (sortBy === "rate asc") {
+        setSortedProducts(
+          products.sort((a, b) => a.reviews.rate - b.reviews.rate)
+        );
+      } else {
+        setSortedProducts(products);
       }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [data, isLoading]);
+    }
+  }, [sortBy, data]);
 
   return (
     <section className="products_list_section">
       <header className="align_center products_list_header">
         <h2>Products</h2>
-        <select name="sort" id="" className="products_sorting">
+        <select
+          name="sort"
+          id=""
+          className="products_sorting"
+          onChange={(e) => setSortBy(e.target.value)}
+        >
           <option value="">Relevance</option>
           <option value="price desc">Price HIGH to LOW</option>
           <option value="price asc">Price LOW to HIGH</option>
@@ -78,20 +110,20 @@ const ProductsList = () => {
       <div className="products_list">
         {error && <em className="form_error">{error}</em>}
         {data?.products &&
-          data.products.map((product) => (
+          sortedProducts.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         {isLoading &&
           skeletons.map((skeleton) => <ProductCardSkeleton key={skeleton} />)}
       </div>
-      {/* {data && (
+      {data && (
         <Pagination
           totalPost={data.totalProducts}
           poseterPerPage={8}
           onClick={handlePageChange}
           currentPage={page}
         />
-      )} */}
+      )}
     </section>
   );
 };
