@@ -1,5 +1,6 @@
 import React, { useContext, memo } from "react";
 
+import config from "../../config.json";
 import star from "../../assets/white-star.png";
 import basket from "../../assets/basket.png";
 import "./ProductCard.css";
@@ -19,7 +20,7 @@ const ProductCard = ({ product, featured }) => {
             {featured ? (
               <div className="product_image">
                 <img
-                  src={`http://localhost:5000/products/${product.images[0]}`}
+                  src={`${config.backendURL}/products/${product.images[0]}`}
                   alt="product image"
                 />
               </div>
