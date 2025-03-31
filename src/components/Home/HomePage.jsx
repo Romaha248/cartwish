@@ -13,7 +13,7 @@ const HomePage = () => {
         subtitle={
           "Experience the power of the latest iPhone with out most Pro camera ever."
         }
-        link={"/products/67e463ceb09156618b6faa24"}
+        link={"/products/67eaadf221eb85c826ce4dc0"}
         image={iphone}
       />
       <FeaturedProducts />
@@ -22,7 +22,7 @@ const HomePage = () => {
         subtitle={
           "U can add Studio Display and colour-mathed Magic accessories to your bag after configure your Mac mini."
         }
-        link={"/products/67e463ceb09156618b6faa30"}
+        link={"/products/67eaadf321eb85c826ce4dcc"}
         image={mac}
       />
     </div>
